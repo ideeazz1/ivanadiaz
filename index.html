@@ -25,14 +25,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px 80px;
+    padding: 56px 32px 96px;
   }
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    border: 3px solid #343A40;
-    box-shadow: inset 0 0 0 1px rgba(52,58,64,0.18);
+    border: 12px solid #343A40;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.45),
+      inset 0 0 0 13px rgba(52,58,64,0.08);
     pointer-events: none;
     z-index: 9999;
   }
