@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rate Admin — Ivan A. Diaz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F8F9FA;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px 80px;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    border: 12px solid #343A40;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 13px rgba(52,58,64,0.08);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .wrap { width: 100%; max-width: 480px; }
+
+  .card {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid #DEE2E6;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(52,58,64,0.07), 0 0 0 1px rgba(52,58,64,0.08);
+    padding: 28px 24px 24px;
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #343A40; opacity: 0.45;
+    text-align: center; margin-bottom: 22px;
+  }
+
+  /* ── Login ── */
+  #login-screen .card { max-width: 340px; margin: 0 auto; }
+  .login-label {
+    font-size: 11px; font-weight: 600; color: #495057;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    display: block; margin-bottom: 8px;
+  }
+  .login-input {
+    width: 100%; padding: 11px 14px;
+    border: 1px solid #DEE2E6; border-radius: 5px;
+    font-family: inherit; font-size: 15px; color: #343A40;
+    background: #F8F9FA; outline: none;
+    transition: border-color 0.15s;
+  }
+  .login-input:focus { border-color: #343A40; background: #fff; }
+  .login-btn {
+    margin-top: 14px; width: 100%;
+    padding: 12px; border: none; border-radius: 5px; cursor: pointer;
+    background: linear-gradient(135deg, #343A40 0%, #495057 100%);
+    color: #fff; font-family: inherit; font-size: 14px; font-weight: 600;
+    letter-spacing: 0.04em; transition: opacity 0.15s;
+  }
+  .login-btn:hover { opacity: 0.88; }
+  .login-error {
+    margin-top: 10px; font-size: 12px; color: #dc3545;
+    text-align: center; min-height: 16px;
+  }
+
+  /* ── Rate cards ── */
+  .rates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .rate-card {
+    background: #F8F9FA;
+    border: 1px solid #DEE2E6;
+    border-radius: 5px;
+    padding: 14px 12px 12px;
+  }
+  .rate-card-name {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: #495057; margin-bottom: 10px;
+  }
+  .field-row { margin-bottom: 8px; }
+  .field-row:last-child { margin-bottom: 0; }
+  .field-label {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #6C757D; display: block; margin-bottom: 3px;
+  }
+  .field-input {
+    width: 100%; padding: 7px 10px;
+    border: 1px solid #DEE2E6; border-radius: 4px;
+    font-family: inherit; font-size: 14px; font-weight: 500; color: #343A40;
+    background: #fff; outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-input:focus { border-color: #343A40; }
+  .field-input.apr-field {
+    background: #E9ECEF; color: #495057; font-size: 13px;
+    cursor: default;
+  }
+  .field-input.apr-field.overridden {
+    background: #fff; color: #343A40; cursor: text;
+  }
+  .apr-row { position: relative; }
+  .apr-override-btn {
+    position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
+    font-size: 9px; color: #6C757D; background: none; border: none;
+    cursor: pointer; padding: 0; letter-spacing: 0.05em; text-transform: uppercase;
+    font-family: inherit;
+  }
+  .apr-override-btn:hover { color: #343A40; }
+
+  /* ── Fee assumptions ── */
+  .assumptions {
+    font-size: 10.5px; color: #6C757D; line-height: 1.7;
+    border-top: 1px solid #E9ECEF; padding-top: 14px; margin-top: 4px;
+  }
+  .assumptions strong { color: #495057; }
+
+  /* ── PAT section ── */
+  .pat-row { position: relative; }
+  .pat-toggle {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    font-size: 11px; color: #6C757D; font-family: inherit;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .pat-toggle:hover { color: #343A40; }
+  .remember-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 10px; font-size: 11.5px; color: #495057;
+  }
+  .remember-row input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; }
+
+  /* ── Save button + status ── */
+  .save-btn {
+    width: 100%; padding: 14px; border: none; border-radius: 5px; cursor: pointer;
+    background: linear-gradient(135deg, #343A40 0%, #495057 100%);
+    color: #fff; font-family: inherit; font-size: 15px; font-weight: 600;
+    letter-spacing: 0.04em; box-shadow: 0 4px 14px rgba(52,58,64,0.22);
+    transition: opacity 0.15s, box-shadow 0.15s;
+  }
+  .save-btn:hover { opacity: 0.9; box-shadow: 0 6px 18px rgba(52,58,64,0.30); }
+  .save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  #status {
+    margin-top: 14px; padding: 12px 16px; border-radius: 5px;
+    font-size: 12.5px; line-height: 1.5; display: none;
+  }
+  #status.ok  { background: #d1e7dd; color: #0a3622; border: 1px solid #a3cfbb; }
+  #status.err { background: #f8d7da; color: #58151c; border: 1px solid #f1aeb5; }
+
+  .section-head {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #343A40; opacity: 0.45;
+    margin-bottom: 14px;
+  }
+
+  .back-link {
+    display: block; text-align: center; margin-top: 10px;
+    font-size: 11.5px; color: #6C757D; text-decoration: none;
+  }
+  .back-link:hover { color: #343A40; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ── Login screen ── -->
+  <div id="login-screen">
+    <div class="card">
+      <p class="page-title">Rate Admin</p>
+      <label class="login-label" for="pw-input">Password</label>
+      <input class="login-input" type="password" id="pw-input"
+             placeholder="Enter password" autocomplete="current-password">
+      <button class="login-btn" id="login-btn">Unlock</button>
+      <p class="login-error" id="login-error"></p>
+    </div>
+    <a class="back-link" href="/">← Back to page</a>
+  </div>
+
+  <!-- ── Admin screen ── -->
+  <div id="admin-screen" style="display:none">
+
+    <!-- Rate cards -->
+    <div class="card">
+      <p class="page-title">Update Today's Rates</p>
+      <div class="rates-grid" id="rates-grid">
+        <!-- injected by JS -->
+      </div>
+      <div class="assumptions" style="margin-top:16px">
+        <strong>APR assumptions</strong> (Reg Z, $350k loan, TX):<br>
+        $1,900 lender processing &nbsp;·&nbsp; $600 title/settlement<br>
+        FHA: +1.75% UFMIP financed into loan<br>
+        DPA: +1.5% Chenoa soft second as finance charge
+      </div>
+    </div>
+
+    <!-- GitHub credentials -->
+    <div class="card">
+      <p class="section-head">GitHub Credentials</p>
+      <div class="field-row pat-row">
+        <label class="field-label" for="pat-input">Personal Access Token</label>
+        <input class="field-input" type="password" id="pat-input"
+               placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+        <button class="pat-toggle" id="pat-toggle" type="button">Show</button>
+      </div>
+      <div class="remember-row">
+        <input type="checkbox" id="remember-pat">
+        <label for="remember-pat">Remember in this browser session</label>
+      </div>
+    </div>
+
+    <!-- Save -->
+    <button class="save-btn" id="save-btn">Save Rates to GitHub</button>
+    <div id="status"></div>
+
+    <a class="back-link" href="/">← Back to page</a>
+  </div>
+
+</div>
+<script>
+/* ── CHANGE PASSWORD HERE ──────────────────────────────────────────────── */
+var ADMIN_PASSWORD = 'IvanRates2025';
+/* ──────────────────────────────────────────────────────────────────────── */
+
+var REPO_OWNER = 'ideeazz1';
+var REPO_NAME  = 'ivanadiaz';
+var FILE_PATH  = 'index.html';
+
+/* Product definitions */
+var PRODUCTS = [
+  { key: 'Conv 30-yr', term: 360, type: 'conv' },
+  { key: 'Conv 15-yr', term: 180, type: 'conv' },
+  { key: 'FHA 30-yr',  term: 360, type: 'fha'  },
+  { key: 'DPA 30-yr',  term: 360, type: 'dpa'  }
+];
+
+/* Fee constants */
+var FEES = { processing: 1900, title: 600, fhaUfmip: 0.0175, chenoa: 0.015, loan: 350000 };
+
+/* ── APR calculation (Reg Z bisection) ─────────────────────────────────── */
+function calcAPR(ratePercent, product) {
+  var r = parseFloat(ratePercent);
+  if (!r || r <= 0 || r > 25) return '';
+
+  var term = product.term;
+  var type = product.type;
+  var L    = FEES.loan;
+
+  var payPrincipal, amtFinanced;
+  if (type === 'conv') {
+    payPrincipal = L;
+    amtFinanced  = L - FEES.processing - FEES.title;
+  } else if (type === 'fha') {
+    payPrincipal = L + L * FEES.fhaUfmip;   /* payment on base + UFMIP */
+    amtFinanced  = L - FEES.processing - FEES.title;
+  } else {
+    payPrincipal = L;
+    amtFinanced  = L - FEES.processing - FEES.title - L * FEES.chenoa;
+  }
+
+  var mr  = r / 100 / 12;
+  var pmt = payPrincipal * mr / (1 - Math.pow(1 + mr, -term));
+
+  /* bisection */
+  var lo = 1e-6, hi = 3.0;
+  for (var i = 0; i < 400; i++) {
+    var mid = (lo + hi) / 2;
+    var mmr = mid / 12;
+    var pv  = pmt * (1 - Math.pow(1 + mmr, -term)) / mmr;
+    if (pv > amtFinanced) lo = mid; else hi = mid;
+  }
+  return (((lo + hi) / 2) * 100).toFixed(3);
+}
+
+/* ── Build the rate card UI ─────────────────────────────────────────────── */
+function buildGrid() {
+  var grid = document.getElementById('rates-grid');
+  PRODUCTS.forEach(function(p) {
+    var card = document.createElement('div');
+    card.className = 'rate-card';
+    card.innerHTML =
+      '<div class="rate-card-name">' + p.key + '</div>' +
+      '<div class="field-row">' +
+        '<label class="field-label" for="rate-' + p.key + '">Rate %</label>' +
+        '<input class="field-input" type="number" step="0.001" min="0" max="25"' +
+               'id="rate-' + p.key + '" placeholder="e.g. 6.375">' +
+      '</div>' +
+      '<div class="field-row apr-row">' +
+        '<label class="field-label" for="apr-' + p.key + '">APR % <span id="apr-tag-' + p.key + '" style="opacity:.6;font-weight:400">(auto)</span></label>' +
+        '<input class="field-input apr-field" type="number" step="0.001" min="0" max="25"' +
+               'id="apr-' + p.key + '" readonly placeholder="—">' +
+        '<button class="apr-override-btn" data-key="' + p.key + '">Edit</button>' +
+      '</div>';
+    grid.appendChild(card);
+
+    /* rate input → auto-calc APR */
+    var rateEl = document.getElementById('rate-' + p.key);
+    var aprEl  = document.getElementById('apr-'  + p.key);
+    rateEl.addEventListener('input', function() {
+      if (aprEl.readOnly) {
+        var result = calcAPR(rateEl.value, p);
+        aprEl.value = result;
+      }
+    });
+  });
+
+  /* override buttons */
+  document.querySelectorAll('.apr-override-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var key   = btn.dataset.key;
+      var aprEl = document.getElementById('apr-' + key);
+      var tag   = document.getElementById('apr-tag-' + key);
+      if (aprEl.readOnly) {
+        aprEl.readOnly = false;
+        aprEl.classList.add('overridden');
+        btn.textContent = 'Auto';
+        tag.textContent = '(manual)';
+      } else {
+        aprEl.readOnly = true;
+        aprEl.classList.remove('overridden');
+        btn.textContent = 'Edit';
+        tag.textContent = '(auto)';
+        /* recalc */
+        var rateEl = document.getElementById('rate-' + key);
+        var prod   = PRODUCTS.find(function(p) { return p.key === key; });
+        aprEl.value = calcAPR(rateEl.value, prod);
+      }
+    });
+  });
+}
+
+/* ── GitHub helpers ─────────────────────────────────────────────────────── */
+function b64Decode(b64) {
+  return decodeURIComponent(escape(atob(b64.replace(/\n/g, ''))));
+}
+function b64Encode(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+function buildRatesBlock(rates) {
+  var keys = ['Conv 30-yr', 'Conv 15-yr', 'FHA 30-yr', 'DPA 30-yr'];
+  var lines = keys.map(function(k) {
+    var v   = rates[k];
+    var pad = (k === 'FHA 30-yr' || k === 'DPA 30-yr') ? '  ' : '';
+    return "    '" + k + "':" + pad + " { rate: '" + v.rate + "', apr: '" + v.apr + "' }";
+  });
+  return 'var RATES = {\n' + lines.join(',\n') + '\n  };';
+}
+
+async function saveToGitHub(pat, newRates) {
+  var api = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + FILE_PATH;
+  var headers = {
+    'Authorization': 'token ' + pat,
+    'Accept': 'application/vnd.github.v3+json'
+  };
+
+  /* 1. Fetch current file */
+  var getRes = await fetch(api, { headers: headers });
+  if (!getRes.ok) {
+    var e = await getRes.json().catch(function() { return {}; });
+    throw new Error('GitHub fetch failed (' + getRes.status + '): ' + (e.message || getRes.statusText));
+  }
+  var fileData = await getRes.json();
+
+  /* 2. Decode */
+  var content = b64Decode(fileData.content);
+
+  /* 3. Replace RATES block */
+  var ratesRx = /var RATES\s*=\s*\{[\s\S]*?\};/;
+  var updated = content.replace(ratesRx, buildRatesBlock(newRates));
+  if (updated === content) throw new Error('Could not locate the RATES object in index.html. Has the file format changed?');
+
+  /* 4. Re-encode & PUT */
+  var putRes = await fetch(api, {
+    method: 'PUT',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, headers),
+    body: JSON.stringify({
+      message: 'Update Today\'s Rates via admin panel',
+      content: b64Encode(updated),
+      sha: fileData.sha
+    })
+  });
+
+  if (!putRes.ok) {
+    var e2 = await putRes.json().catch(function() { return {}; });
+    throw new Error('GitHub save failed (' + putRes.status + '): ' + (e2.message || putRes.statusText));
+  }
+  return await putRes.json();
+}
+
+/* ── Login ──────────────────────────────────────────────────────────────── */
+function showAdmin() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = '';
+  buildGrid();
+  /* restore saved PAT */
+  var saved = sessionStorage.getItem('admin_pat');
+  if (saved) {
+    document.getElementById('pat-input').value = saved;
+    document.getElementById('remember-pat').checked = true;
+  }
+}
+
+document.getElementById('login-btn').addEventListener('click', function() {
+  var pw = document.getElementById('pw-input').value;
+  if (pw === ADMIN_PASSWORD) {
+    sessionStorage.setItem('admin_auth', '1');
+    document.getElementById('login-error').textContent = '';
+    showAdmin();
+  } else {
+    document.getElementById('login-error').textContent = 'Incorrect password.';
+    document.getElementById('pw-input').value = '';
+  }
+});
+
+document.getElementById('pw-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('login-btn').click();
+});
+
+/* auto-unlock if already authenticated this session */
+if (sessionStorage.getItem('admin_auth') === '1') {
+  showAdmin();
+}
+
+/* ── PAT toggle ─────────────────────────────────────────────────────────── */
+document.getElementById('pat-toggle').addEventListener('click', function() {
+  var inp = document.getElementById('pat-input');
+  var show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  this.textContent = show ? 'Hide' : 'Show';
+});
+
+/* ── Save ────────────────────────────────────────────────────────────────── */
+document.getElementById('save-btn').addEventListener('click', async function() {
+  var status = document.getElementById('status');
+  var btn    = document.getElementById('save-btn');
+
+  /* collect values */
+  var newRates = {};
+  var errors   = [];
+  PRODUCTS.forEach(function(p) {
+    var rate = parseFloat(document.getElementById('rate-' + p.key).value);
+    var apr  = parseFloat(document.getElementById('apr-'  + p.key).value);
+    if (!rate || isNaN(rate)) errors.push(p.key + ': rate missing');
+    if (!apr  || isNaN(apr))  errors.push(p.key + ': APR missing');
+    newRates[p.key] = { rate: rate.toFixed(3), apr: apr.toFixed(3) };
+  });
+
+  if (errors.length) {
+    status.className = 'err';
+    status.textContent = 'Fix these before saving: ' + errors.join(', ');
+    status.style.display = 'block';
+    return;
+  }
+
+  var pat = document.getElementById('pat-input').value.trim();
+  if (!pat) {
+    status.className = 'err';
+    status.textContent = 'Enter your GitHub Personal Access Token.';
+    status.style.display = 'block';
+    return;
+  }
+
+  if (document.getElementById('remember-pat').checked) {
+    sessionStorage.setItem('admin_pat', pat);
+  } else {
+    sessionStorage.removeItem('admin_pat');
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  status.style.display = 'none';
+
+  try {
+    await saveToGitHub(pat, newRates);
+    status.className = 'ok';
+    status.innerHTML = '<strong>Saved!</strong> GitHub Pages will update in ~30 seconds. ' +
+      '<a href="https://ivanadiaz.com" target="_blank" rel="noopener" style="color:inherit">View live site &rarr;</a>';
+    status.style.display = 'block';
+  } catch (err) {
+    status.className = 'err';
+    status.textContent = err.message;
+    status.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Rates to GitHub';
+  }
+});
+</script>
+</body>
+</html>
